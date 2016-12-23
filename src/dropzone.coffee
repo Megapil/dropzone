@@ -200,6 +200,10 @@ class Dropzone extends Emitter
     # If false, previews won't be rendered.
     previewsContainer: null
 
+    # If `end` preview element will be added to end of preview container (append)
+    # If `start` preview element will be added to first of preview container (prepend)
+    previewPosition: "end"
+
     # Selector for hidden input container
     hiddenInputContainer: "body"
 
@@ -382,7 +386,12 @@ class Dropzone extends Emitter
         file.previewElement = Dropzone.createElement @options.previewTemplate.trim()
         file.previewTemplate = file.previewElement # Backwards compatibility
 
-        @previewsContainer.appendChild file.previewElement
+        switch @options.previewPosition
+            when "end" then @previewsContainer.appendChild file.previewElement
+            when "start" then @previewsContainer.insertBefore file.previewElement, @previewsContainer.firstChild
+            else throw new Error "Invalid value for previewPosition. Use either 'append' or 'prepend'"
+
+
         node.textContent = @_renameFilename(file.name, file) for node in file.previewElement.querySelectorAll("[data-dz-name]")
         node.innerHTML = @filesize file.size for node in file.previewElement.querySelectorAll("[data-dz-size]")
 
